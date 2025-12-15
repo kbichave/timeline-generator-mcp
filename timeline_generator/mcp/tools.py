@@ -275,6 +275,7 @@ def generate_timeline_impl(
     accent_color: Optional[str] = None,
     fps: int = 30,
     duration: float = 5.0,
+    text_wrap: Optional[bool] = None,
 ) -> TimelineResult:
     """
     Generate a timeline from full configuration.
@@ -289,6 +290,7 @@ def generate_timeline_impl(
         accent_color: Custom accent color (hex)
         fps: Frames per second for GIF
         duration: Animation duration for GIF
+        text_wrap: Enable/disable text wrapping for long titles/descriptions
         
     Returns:
         TimelineResult with success status and image data
@@ -321,6 +323,8 @@ def generate_timeline_impl(
             config.output.fps = fps
         if duration:
             config.output.duration = duration
+        if text_wrap is not None:
+            config.text_wrap = text_wrap
         
         # Get theme and apply custom colors
         theme_instance = get_theme(config.theme.value)
@@ -384,6 +388,7 @@ def quick_timeline_impl(
     accent_color: Optional[str] = None,
     fps: int = 30,
     duration: float = 5.0,
+    text_wrap: bool = True,
 ) -> TimelineResult:
     """
     Generate a timeline quickly from inline milestones.
@@ -400,6 +405,7 @@ def quick_timeline_impl(
         accent_color: Custom accent color
         fps: Frames per second for GIF
         duration: Animation duration for GIF
+        text_wrap: Enable text wrapping for long titles/descriptions
         
     Returns:
         TimelineResult with success status and image data
@@ -423,6 +429,7 @@ def quick_timeline_impl(
             width=width,
             height=height,
             transparent=transparent,
+            text_wrap=text_wrap,
         )
         
         # Apply accent color if provided

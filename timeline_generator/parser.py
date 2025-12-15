@@ -383,6 +383,7 @@ def create_config_from_quick(
     fps: int = 30,
     duration: float = 5.0,
     transparent: bool = False,
+    text_wrap: bool = True,
 ) -> TimelineConfig:
     """
     Create a TimelineConfig from quick milestone inputs.
@@ -399,6 +400,7 @@ def create_config_from_quick(
         fps: Frames per second for animations.
         duration: Animation duration in seconds.
         transparent: Use transparent background.
+        text_wrap: Enable text wrapping for long titles/descriptions.
         
     Returns:
         TimelineConfig object.
@@ -409,6 +411,7 @@ def create_config_from_quick(
         scale=scale,
         theme=theme,
         milestones=milestones,
+        text_wrap=text_wrap,
         output={
             "format": output_format,
             "width": width,

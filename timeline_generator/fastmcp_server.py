@@ -90,6 +90,7 @@ def quick_timeline(
     output_format: Annotated[str, "Output format: png, gif, svg"] = "png",
     width: Annotated[int, "Image width in pixels"] = 1920,
     height: Annotated[int, "Image height in pixels"] = 800,
+    text_wrap: Annotated[bool, "Enable text wrapping for long titles/descriptions"] = True,
 ) -> str:
     """
     Quickly generate a timeline from a list of milestones.
@@ -107,6 +108,7 @@ def quick_timeline(
         output_format=output_format,
         width=width,
         height=height,
+        text_wrap=text_wrap,
     )
     
     if result.success:

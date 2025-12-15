@@ -151,6 +151,7 @@ class TimelineConfig(BaseModel):
     show_dates: bool = Field(default=True)
     show_descriptions: bool = Field(default=True)
     compact_mode: bool = Field(default=False, description="Reduce spacing for dense timelines")
+    text_wrap: bool = Field(default=True, description="Enable text wrapping for long titles/descriptions")
     
     # Category/swimlane settings (for roadmap and gantt)
     categories: Optional[list[str]] = Field(

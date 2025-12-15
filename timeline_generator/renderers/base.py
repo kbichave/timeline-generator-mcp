@@ -319,14 +319,17 @@ class BaseRenderer(ABC):
         max_width: Optional[float] = None,
         align: str = "left",
         opacity: float = 1.0,
-        wrap: bool = True,
+        wrap: Optional[bool] = None,
     ) -> None:
         """Draw text with optional wrapping and alignment."""
         self.theme.apply_font(self.ctx, font_config)
         r, g, b, _ = self.theme.hex_to_rgba(color)
         self.ctx.set_source_rgba(r, g, b, opacity)
         
-        if max_width and wrap:
+        # Use config's text_wrap setting if wrap is not explicitly specified
+        should_wrap = wrap if wrap is not None else self.config.text_wrap
+        
+        if max_width and should_wrap:
             # Word wrap text
             lines = self._wrap_text(text, max_width)
             line_height = font_config.size * 1.3

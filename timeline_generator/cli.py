@@ -114,6 +114,11 @@ def generate(
         "--accent-color",
         help="Custom accent color in hex format (e.g., #FF5733).",
     ),
+    text_wrap: Optional[bool] = typer.Option(
+        None,
+        "--text-wrap/--no-text-wrap",
+        help="Enable or disable text wrapping for long titles/descriptions.",
+    ),
 ):
     """Generate a timeline from a configuration file."""
     try:
@@ -145,6 +150,10 @@ def generate(
             if config.colors is None:
                 config.colors = ColorConfig()
             config.colors.accent = accent_color
+        
+        # Apply text wrap override
+        if text_wrap is not None:
+            config.text_wrap = text_wrap
         
         # Determine output path
         if output is None:
@@ -278,6 +287,11 @@ def quick(
         "--accent-color",
         help="Custom accent color in hex format (e.g., #FF5733).",
     ),
+    text_wrap: bool = typer.Option(
+        True,
+        "--text-wrap/--no-text-wrap",
+        help="Enable or disable text wrapping for long titles/descriptions.",
+    ),
 ):
     """
     Quickly generate a timeline from inline milestones.
@@ -303,6 +317,7 @@ def quick(
             fps=fps,
             duration=duration,
             transparent=transparent,
+            text_wrap=text_wrap,
         )
         
         # Apply accent color override
@@ -485,6 +500,8 @@ milestones:
     description: "Official release to production"
     highlight: true
     color: "#4CAF50"
+
+text_wrap: true          # Enable text wrapping for long titles/descriptions
 
 output:
   format: png           # png, svg, gif, mp4

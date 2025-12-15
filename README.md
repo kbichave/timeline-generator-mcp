@@ -121,6 +121,9 @@ milestones:
 colors:
   accent: "#FF5733"
 
+# Optional: Text wrapping
+text_wrap: true  # Set to false to disable text wrapping
+
 output:
   format: png
   transparent: false
@@ -150,6 +153,7 @@ Options:
   -d, --duration FLOAT    Animation duration in seconds (default: 5.0)
   --transparent           Use transparent background
   --accent-color TEXT     Custom accent color (e.g., #FF5733)
+  --text-wrap/--no-text-wrap  Enable/disable text wrapping (default: enabled)
 ```
 
 ### `quick` - Quick inline generation
@@ -487,6 +491,21 @@ This is especially useful for:
 - **Quarters**: "Q1", "Q2", "Q3", "Q4"
 - **Years**: "2020", "2021", "2022"
 - **Custom labels**: "MVP", "v1.0", "GA"
+
+## Text Wrapping
+
+Control whether long titles and descriptions wrap to multiple lines:
+
+```yaml
+text_wrap: true   # Enable wrapping (default)
+text_wrap: false  # Disable wrapping - text will be truncated
+```
+
+Or via CLI:
+```bash
+timeline-gen generate config.yaml --no-text-wrap -o timeline.png
+timeline-gen quick "2024-01:Long Title Here" --no-text-wrap
+```
 
 ## Transparent Background
 
