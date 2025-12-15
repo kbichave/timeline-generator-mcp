@@ -319,19 +319,30 @@ class BaseRenderer(ABC):
         max_width: Optional[float] = None,
         align: str = "left",
         opacity: float = 1.0,
+        wrap: bool = True,
     ) -> None:
         """Draw text with optional wrapping and alignment."""
         self.theme.apply_font(self.ctx, font_config)
         r, g, b, _ = self.theme.hex_to_rgba(color)
         self.ctx.set_source_rgba(r, g, b, opacity)
         
-        if max_width:
-            # Simple text truncation
-            extents = self.ctx.text_extents(text)
-            if extents.width > max_width:
-                while len(text) > 3 and self.ctx.text_extents(text + "...").width > max_width:
-                    text = text[:-1]
-                text = text + "..."
+        if max_width and wrap:
+            # Word wrap text
+            lines = self._wrap_text(text, max_width)
+            line_height = font_config.size * 1.3
+            
+            for i, line in enumerate(lines):
+                extents = self.ctx.text_extents(line)
+                line_x = x
+                
+                if align == "center":
+                    line_x = x + (max_width - extents.width) / 2
+                elif align == "right":
+                    line_x = x + max_width - extents.width
+                
+                self.ctx.move_to(line_x, y + font_config.size + (i * line_height))
+                self.ctx.show_text(line)
+            return
         
         extents = self.ctx.text_extents(text)
         
@@ -342,6 +353,34 @@ class BaseRenderer(ABC):
         
         self.ctx.move_to(x, y + font_config.size)
         self.ctx.show_text(text)
+    
+    def _wrap_text(self, text: str, max_width: float) -> list[str]:
+        """Wrap text to fit within max_width."""
+        words = text.split()
+        lines = []
+        current_line = ""
+        
+        for word in words:
+            test_line = f"{current_line} {word}".strip() if current_line else word
+            extents = self.ctx.text_extents(test_line)
+            
+            if extents.width <= max_width:
+                current_line = test_line
+            else:
+                if current_line:
+                    lines.append(current_line)
+                # Check if single word is too long
+                if self.ctx.text_extents(word).width > max_width:
+                    # Truncate long word
+                    while len(word) > 3 and self.ctx.text_extents(word + "...").width > max_width:
+                        word = word[:-1]
+                    word = word + "..."
+                current_line = word
+        
+        if current_line:
+            lines.append(current_line)
+        
+        return lines if lines else [text]
     
     def surface_to_pil(self) -> Image.Image:
         """Convert Cairo surface to PIL Image."""

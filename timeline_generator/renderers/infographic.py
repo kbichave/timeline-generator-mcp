@@ -47,10 +47,14 @@ class InfographicRenderer(BaseRenderer):
         if len(layout.milestone_layouts) < 2:
             return
         
+        # Use higher opacity for transparent mode (GIF can't do semi-transparency)
+        line_opacity = 0.6 if self.config.output.transparent else 0.3
+        dot_opacity = 0.4 if self.config.output.transparent else 0.15
+        
         # Draw curved path connecting milestones
         self.ctx.set_line_width(self.theme.line_width)
         r, g, b, _ = self.theme.hex_to_rgba(self.theme.colors.primary)
-        self.ctx.set_source_rgba(r, g, b, 0.3)
+        self.ctx.set_source_rgba(r, g, b, line_opacity)
         
         # Start path
         first = layout.milestone_layouts[0]
@@ -74,7 +78,7 @@ class InfographicRenderer(BaseRenderer):
         
         # Draw dotted continuation lines
         self.ctx.set_dash([8, 4])
-        self.ctx.set_source_rgba(r, g, b, 0.15)
+        self.ctx.set_source_rgba(r, g, b, dot_opacity)
         
         for ml in layout.milestone_layouts:
             # Small decorative lines around each node
