@@ -1,0 +1,48 @@
+# Dense Timeline Example
+# Tests collision detection with many close milestones
+
+title: "Dense Sprint Timeline"
+subtitle: "Testing collision detection"
+scale: daily
+style: horizontal
+theme: corporate
+
+milestones:
+  - date: "2024-03-01"
+    title: "Sprint Start"
+    description: "Planning session"
+    
+  - date: "2024-03-02"
+    title: "Design Review"
+    description: "Review mockups"
+    
+  - date: "2024-03-03"
+    title: "API Design"
+    description: "Define endpoints"
+    
+  - date: "2024-03-04"
+    title: "Frontend Kickoff"
+    description: "React setup"
+    
+  - date: "2024-03-05"
+    title: "Backend Start"
+    description: "Node.js setup"
+    
+  - date: "2024-03-06"
+    title: "Database"
+    description: "Schema design"
+    
+  - date: "2024-03-07"
+    title: "Integration"
+    description: "Connect services"
+    
+  - date: "2024-03-08"
+    title: "Testing"
+    description: "Unit tests"
+    highlight: true
+
+output:
+  format: png
+  width: 1920
+  height: 900
+

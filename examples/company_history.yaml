@@ -1,0 +1,76 @@
+# Company History Timeline
+# Style: Vertical
+# A chronological view of company milestones
+
+title: "Our Company Story"
+subtitle: "From startup to industry leader"
+scale: yearly
+style: vertical
+theme: minimal
+
+milestones:
+  - date: "2015-03-15"
+    title: "Founded"
+    description: "Started in a small garage with 3 co-founders and a big dream"
+    highlight: true
+    
+  - date: "2016-06-01"
+    title: "Seed Funding"
+    description: "Raised $500K from angel investors"
+    
+  - date: "2017-02-20"
+    title: "First Product Launch"
+    description: "Released MVP to 100 beta users"
+    highlight: true
+    
+  - date: "2017-11-15"
+    title: "10K Users"
+    description: "Reached first major user milestone"
+    
+  - date: "2018-04-10"
+    title: "Series A"
+    description: "Raised $5M to scale operations"
+    highlight: true
+    
+  - date: "2019-01-08"
+    title: "Team of 50"
+    description: "Expanded to new office space"
+    
+  - date: "2019-09-22"
+    title: "Enterprise Launch"
+    description: "Introduced enterprise tier with advanced features"
+    
+  - date: "2020-03-01"
+    title: "Remote First"
+    description: "Transitioned to fully distributed team"
+    
+  - date: "2020-08-15"
+    title: "100K Users"
+    description: "Major growth milestone achieved"
+    highlight: true
+    
+  - date: "2021-06-30"
+    title: "Series B"
+    description: "Raised $25M for international expansion"
+    highlight: true
+    
+  - date: "2022-04-01"
+    title: "European Office"
+    description: "Opened first international headquarters in London"
+    
+  - date: "2023-01-15"
+    title: "1M Users"
+    description: "Crossed one million active users"
+    highlight: true
+    
+  - date: "2024-02-01"
+    title: "IPO Announcement"
+    description: "Announced plans for public offering"
+    highlight: true
+    color: "#4CAF50"
+
+output:
+  format: png
+  width: 1200
+  height: 2400
+

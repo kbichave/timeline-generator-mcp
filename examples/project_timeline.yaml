@@ -1,0 +1,57 @@
+# Project Timeline Example
+# Style: Horizontal Timeline
+# A simple project timeline showing key milestones
+
+title: "Website Redesign Project"
+subtitle: "Q1-Q3 2024 Development Roadmap"
+scale: monthly
+style: horizontal
+theme: corporate
+
+milestones:
+  - date: "2024-01-08"
+    title: "Project Kickoff"
+    description: "Initial meeting with stakeholders"
+    highlight: true
+    
+  - date: "2024-01-22"
+    title: "Research Phase"
+    description: "User research and competitive analysis"
+    
+  - date: "2024-02-12"
+    title: "Wireframes Complete"
+    description: "Low-fidelity wireframes approved"
+    
+  - date: "2024-03-04"
+    title: "Design System"
+    description: "Component library and style guide"
+    
+  - date: "2024-03-25"
+    title: "UI Designs Finalized"
+    description: "High-fidelity mockups approved"
+    highlight: true
+    
+  - date: "2024-04-15"
+    title: "Development Begins"
+    description: "Frontend implementation starts"
+    
+  - date: "2024-05-20"
+    title: "Alpha Release"
+    description: "Internal testing phase"
+    
+  - date: "2024-06-24"
+    title: "Beta Launch"
+    description: "Limited public beta"
+    highlight: true
+    
+  - date: "2024-07-29"
+    title: "Go Live"
+    description: "Full production deployment"
+    highlight: true
+    color: "#4CAF50"
+
+output:
+  format: png
+  width: 1920
+  height: 800
+

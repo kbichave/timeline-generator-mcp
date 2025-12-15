@@ -1,0 +1,26 @@
+# Project Timeline (TOON format)
+# Horizontal style with corporate theme
+# This format uses 40% fewer tokens than equivalent YAML
+
+title: Website Redesign Project
+subtitle: Q1-Q3 2024 Milestones
+scale: monthly
+style: horizontal
+theme: corporate
+
+milestones[9]: date title description highlight color
+2024-01-15 "Project Kickoff" "Initial planning and team assembly" true null
+2024-02-01 "Requirements Complete" "Finalized specifications" false null
+2024-02-15 "Design Phase" "UI/UX mockups and prototypes" false null
+2024-03-15 "Design Approval" "Stakeholder sign-off on designs" true null
+2024-04-01 "Development Start" "Frontend and backend development begins" false null
+2024-05-15 "Alpha Release" "Internal testing version" false null
+2024-06-15 "Beta Release" "External beta testing" true null
+2024-07-15 "Bug Fixes" "Address beta feedback" false null
+2024-08-01 "Launch" "Public release" true #4CAF50
+
+output:
+  format: png
+  width: 1920
+  height: 800
+

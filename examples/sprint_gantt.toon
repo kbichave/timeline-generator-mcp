@@ -1,0 +1,24 @@
+# Sprint Gantt Chart (TOON format)
+# Gantt style with dark theme
+# Shows task durations and progress
+
+title: Sprint 23 - User Dashboard
+scale: daily
+style: gantt
+theme: dark
+
+milestones[8]: date title end_date progress category
+2024-01-08 "Sprint Planning" 2024-01-08 100 Planning
+2024-01-09 "UI Design" 2024-01-12 100 Design
+2024-01-09 "API Design" 2024-01-11 100 Design
+2024-01-15 "Frontend Dev" 2024-01-26 85 Development
+2024-01-15 "Backend Dev" 2024-01-24 90 Development
+2024-01-22 "Integration" 2024-01-26 60 Development
+2024-01-29 "Testing" 2024-02-02 30 QA
+2024-02-05 "Deployment" 2024-02-05 0 Release
+
+output:
+  format: png
+  width: 1920
+  height: 900
+

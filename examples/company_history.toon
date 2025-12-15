@@ -1,0 +1,30 @@
+# Company History (TOON format)
+# Vertical style with minimal theme
+# Ideal for long chronological histories
+
+title: TechCorp History
+subtitle: From Startup to Scale
+scale: yearly
+style: vertical
+theme: minimal
+
+milestones[13]: date title description highlight
+2015-03-01 Founded "Started in a garage with 2 founders" true
+2015-09-01 "First Product" "Launched MVP to early adopters" false
+2016-06-01 "Seed Funding" "$500K from angel investors" false
+2017-01-01 "10 Employees" "Moved to first office space" false
+2017-08-01 "Series A" "$5M funding round" true
+2018-03-01 "Product-Market Fit" "10,000 active users milestone" false
+2019-01-01 "50 Employees" "Opened second office" false
+2019-09-01 "Series B" "$25M funding round" true
+2020-06-01 "100 Employees" "Went fully remote" false
+2021-03-01 "International" "Expanded to Europe and Asia" false
+2021-11-01 "Series C" "$100M funding round" true
+2023-01-01 "500 Employees" "Opened 5 global offices" false
+2024-01-01 "IPO Preparation" "Preparing for public offering" true
+
+output:
+  format: png
+  width: 1200
+  height: 2400
+

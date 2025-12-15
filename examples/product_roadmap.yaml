@@ -1,0 +1,81 @@
+# Product Roadmap Example
+# Style: Roadmap with swimlanes
+# A product roadmap with categorized features
+
+title: "Product Roadmap 2024"
+subtitle: "Feature releases by category"
+scale: quarterly
+style: roadmap
+theme: creative
+
+# Categories define the swimlanes
+categories:
+  - "Core Platform"
+  - "Integrations"
+  - "Mobile"
+  - "Analytics"
+
+milestones:
+  # Q1 Releases
+  - date: "2024-01-15"
+    title: "User Authentication v2"
+    description: "SSO and MFA support"
+    category: "Core Platform"
+    highlight: true
+    
+  - date: "2024-02-01"
+    title: "Slack Integration"
+    description: "Real-time notifications"
+    category: "Integrations"
+    
+  - date: "2024-02-15"
+    title: "iOS App Launch"
+    description: "Native iOS application"
+    category: "Mobile"
+    highlight: true
+    
+  # Q2 Releases
+  - date: "2024-04-01"
+    title: "API v3"
+    description: "RESTful API redesign"
+    category: "Core Platform"
+    
+  - date: "2024-04-15"
+    title: "Dashboard Builder"
+    description: "Custom analytics dashboards"
+    category: "Analytics"
+    
+  - date: "2024-05-01"
+    title: "Salesforce Connector"
+    description: "Bi-directional sync"
+    category: "Integrations"
+    
+  - date: "2024-05-15"
+    title: "Android App Launch"
+    description: "Native Android application"
+    category: "Mobile"
+    highlight: true
+    
+  # Q3 Releases
+  - date: "2024-07-01"
+    title: "Team Workspaces"
+    description: "Collaborative spaces"
+    category: "Core Platform"
+    highlight: true
+    
+  - date: "2024-08-01"
+    title: "Predictive Analytics"
+    description: "ML-powered insights"
+    category: "Analytics"
+    highlight: true
+    
+  - date: "2024-09-01"
+    title: "Zapier Integration"
+    description: "1000+ app connections"
+    category: "Integrations"
+
+output:
+  format: png
+  width: 1920
+  height: 1200
+

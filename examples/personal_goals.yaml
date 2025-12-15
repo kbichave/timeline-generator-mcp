@@ -1,0 +1,63 @@
+# Personal Goals Timeline
+# Style: Infographic
+# A creative visualization of personal milestones
+
+title: "My 2024 Journey"
+subtitle: "Personal growth milestones"
+scale: monthly
+style: infographic
+theme: creative
+
+milestones:
+  - date: "2024-01-01"
+    title: "New Year Resolution"
+    description: "Set goals for the year ahead"
+    highlight: true
+    color: "#FF6B6B"
+    
+  - date: "2024-02-14"
+    title: "Complete Online Course"
+    description: "Finished Python programming certification"
+    color: "#4ECDC4"
+    
+  - date: "2024-03-20"
+    title: "First Marathon"
+    description: "Completed my first full marathon!"
+    highlight: true
+    color: "#FFE66D"
+    
+  - date: "2024-05-15"
+    title: "Career Milestone"
+    description: "Promoted to Senior Developer"
+    highlight: true
+    color: "#95E1D3"
+    
+  - date: "2024-07-01"
+    title: "Travel Adventure"
+    description: "Backpacking trip through Europe"
+    color: "#F38181"
+    
+  - date: "2024-09-01"
+    title: "Side Project Launch"
+    description: "Launched my first mobile app"
+    highlight: true
+    color: "#AA96DA"
+    
+  - date: "2024-11-15"
+    title: "Community Impact"
+    description: "Organized local coding workshop"
+    color: "#FCBAD3"
+    
+  - date: "2024-12-31"
+    title: "Year in Review"
+    description: "Reflect on achievements"
+    highlight: true
+    color: "#A8D8EA"
+
+output:
+  format: gif
+  width: 1600
+  height: 1200
+  fps: 24
+  duration: 6
+

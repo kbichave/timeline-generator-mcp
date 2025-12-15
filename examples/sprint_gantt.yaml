@@ -1,0 +1,71 @@
+# Sprint Gantt Chart Example
+# Style: Gantt
+# A project management view with task durations
+
+title: "Sprint 12 - Feature Development"
+subtitle: "March 1-14, 2024"
+scale: daily
+style: gantt
+theme: dark
+
+milestones:
+  - date: "2024-03-01"
+    end_date: "2024-03-02"
+    title: "Sprint Planning"
+    description: "Define sprint goals and tasks"
+    progress: 100
+    
+  - date: "2024-03-01"
+    end_date: "2024-03-05"
+    title: "Backend API Development"
+    description: "Implement new endpoints"
+    progress: 100
+    category: "development"
+    
+  - date: "2024-03-03"
+    end_date: "2024-03-08"
+    title: "Frontend Components"
+    description: "Build React components"
+    progress: 75
+    category: "development"
+    
+  - date: "2024-03-04"
+    end_date: "2024-03-07"
+    title: "Database Migration"
+    description: "Schema updates and data migration"
+    progress: 100
+    category: "infrastructure"
+    
+  - date: "2024-03-06"
+    end_date: "2024-03-10"
+    title: "Integration Testing"
+    description: "End-to-end test suite"
+    progress: 50
+    category: "qa"
+    
+  - date: "2024-03-08"
+    end_date: "2024-03-12"
+    title: "UI Polish"
+    description: "Animations and micro-interactions"
+    progress: 25
+    category: "design"
+    
+  - date: "2024-03-11"
+    end_date: "2024-03-13"
+    title: "Code Review"
+    description: "Peer review and refactoring"
+    progress: 0
+    category: "development"
+    
+  - date: "2024-03-13"
+    end_date: "2024-03-14"
+    title: "Sprint Review"
+    description: "Demo and retrospective"
+    progress: 0
+    highlight: true
+
+output:
+  format: png
+  width: 1920
+  height: 900
+
