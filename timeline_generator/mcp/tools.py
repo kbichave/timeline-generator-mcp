@@ -133,20 +133,26 @@ output:
   height: 1200''',
 
     "infographic": '''# Infographic Timeline (TOON format)
+# Use badge field for custom text in circles (e.g., month names)
+# Use fonts to control badge and title sizes
 title: My Journey
 scale: yearly
 style: infographic
 theme: creative
-milestones[3]: date title description highlight
-2020-01-01 "Started Learning" "Began coding" false
-2021-06-01 "First Job" "Junior dev role" true
-2023-01-01 "Tech Lead" "Leading team of 5" true
+fonts:
+  badge: 28
+  title: 16
+milestones[3]: date badge title
+2020-01-01 "2020" "Started Learning"
+2021-06-01 "Jun" "First Job"
+2023-01-01 "Q1" "Tech Lead"
 output:
   format: gif
   width: 1600
   height: 1200
   fps: 20
-  duration: 5''',
+  duration: 5
+  transparent: true''',
 }
 
 YAML_TEMPLATES = {
@@ -233,17 +239,25 @@ output:
 scale: yearly
 style: infographic
 theme: creative
+fonts:
+  badge: 28
+  title: 16
 milestones:
   - date: "2020-01-01"
     title: "Started Learning"
-    description: "Began coding"
+    badge: "2020"
   - date: "2021-06-01"
     title: "First Job"
+    badge: "Jun"
     highlight: true
+  - date: "2022-01-01"
+    title: "Promoted"
+    badge: "Q1"
 output:
   format: gif
   width: 1600
-  height: 1200''',
+  height: 1200
+  transparent: true''',
 }
 
 

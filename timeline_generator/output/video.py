@@ -116,27 +116,46 @@ class VideoExporter:
         if not frames:
             raise ValueError("No frames generated")
         
+        # Check if transparent
+        is_transparent = self.config.output.transparent
+        
         # Convert to palette mode for smaller GIF
         if optimize:
-            frames = [self._optimize_frame(f) for f in frames]
+            frames = [self._optimize_frame(f, transparent=is_transparent) for f in frames]
         
         # Save as GIF
-        frames[0].save(
-            path,
-            save_all=True,
-            append_images=frames[1:],
-            duration=frame_duration,
-            loop=loop,
-            optimize=optimize,
-        )
+        save_kwargs = {
+            "save_all": True,
+            "append_images": frames[1:],
+            "duration": frame_duration,
+            "loop": loop,
+            "optimize": optimize,
+        }
+        
+        # Add transparency settings if needed
+        if is_transparent and 'transparency' in frames[0].info:
+            save_kwargs["transparency"] = frames[0].info['transparency']
+            save_kwargs["disposal"] = 2  # Restore to background
+        
+        frames[0].save(path, **save_kwargs)
         
         return path
     
-    def _optimize_frame(self, frame: Image.Image) -> Image.Image:
+    def _optimize_frame(self, frame: Image.Image, transparent: bool = False) -> Image.Image:
         """Optimize a frame for GIF format."""
-        # Convert to P mode with adaptive palette
-        if frame.mode == "RGBA":
-            # Create a white background
+        if transparent and frame.mode == "RGBA":
+            # Keep transparency for GIF
+            # Convert RGBA to P with transparency
+            alpha = frame.split()[3]
+            frame = frame.convert("RGB").quantize(colors=255, method=Image.Quantize.MEDIANCUT)
+            frame = frame.convert("P")
+            # Set transparency index
+            mask = Image.eval(alpha, lambda a: 255 if a <= 128 else 0)
+            frame.paste(255, mask)
+            frame.info['transparency'] = 255
+            return frame
+        elif frame.mode == "RGBA":
+            # Create a white background for non-transparent
             background = Image.new("RGB", frame.size, (255, 255, 255))
             background.paste(frame, mask=frame.split()[3])
             frame = background

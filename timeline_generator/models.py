@@ -56,6 +56,10 @@ class Milestone(BaseModel):
     color: Optional[str] = Field(default=None, pattern=r"^#[0-9A-Fa-f]{6}$")
     highlight: bool = Field(default=False, description="Make this milestone stand out")
     category: Optional[str] = Field(default=None, max_length=50)
+    badge: Optional[str] = Field(
+        default=None, max_length=10, 
+        description="Custom text for marker/badge (e.g., 'Feb', 'Q1'). If not set, uses number."
+    )
     end_date: Optional[datetime] = Field(
         default=None, description="End date for duration-based milestones (Gantt)"
     )
@@ -97,6 +101,14 @@ class ColorConfig(BaseModel):
     axis: Optional[str] = Field(default=None, pattern=r"^#[0-9A-Fa-f]{6}$")
 
 
+class FontConfig(BaseModel):
+    """Font size configuration."""
+    
+    badge: Optional[int] = Field(default=None, ge=8, le=120, description="Badge/marker font size")
+    title: Optional[int] = Field(default=None, ge=8, le=120, description="Milestone title font size")
+    description: Optional[int] = Field(default=None, ge=8, le=72, description="Description font size")
+
+
 class OutputConfig(BaseModel):
     """Configuration for output generation."""
     
@@ -127,6 +139,11 @@ class TimelineConfig(BaseModel):
     # Custom color overrides
     colors: Optional[ColorConfig] = Field(
         default=None, description="Custom colors to override theme defaults"
+    )
+    
+    # Custom font sizes
+    fonts: Optional[FontConfig] = Field(
+        default=None, description="Custom font sizes to override theme defaults"
     )
     
     # Optional layout customization

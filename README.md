@@ -449,6 +449,60 @@ colors:
   axis: "#E0E0E0"
 ```
 
+## Custom Fonts
+
+Control font sizes for different elements:
+
+```yaml
+fonts:
+  badge: 28       # Text inside milestone markers (default: theme title size)
+  title: 18       # Milestone titles (default: theme label size)
+  description: 14 # Descriptions (default: theme date size)
+```
+
+## Custom Badges
+
+The `badge` field lets you customize what appears inside milestone markers (circles in infographic style, numbers in other styles):
+
+```yaml
+# YAML format
+milestones:
+  - date: "2025-02-01"
+    badge: "Feb"          # Shows "Feb" instead of "1"
+    title: "Project Start"
+  - date: "2025-06-01"
+    badge: "Q2"           # Shows "Q2" instead of "2"
+    title: "Mid-Year Review"
+```
+
+```
+# TOON format
+milestones[2]: date badge title
+2025-02-01 "Feb" "Project Start"
+2025-06-01 "Q2" "Mid-Year Review"
+```
+
+This is especially useful for:
+- **Month names**: "Jan", "Feb", "Mar"
+- **Quarters**: "Q1", "Q2", "Q3", "Q4"
+- **Years**: "2020", "2021", "2022"
+- **Custom labels**: "MVP", "v1.0", "GA"
+
+## Transparent Background
+
+Export timelines with no background for overlays on slides, websites, or videos:
+
+```yaml
+output:
+  format: gif        # Works with PNG and GIF
+  transparent: true  # No background - just the timeline elements
+```
+
+Or via CLI:
+```bash
+timeline-gen generate config.yaml --transparent -o timeline.png
+```
+
 ## Development
 
 ### Setup

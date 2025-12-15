@@ -24,6 +24,10 @@ class InfographicRenderer(BaseRenderer):
         # Call base background first
         super().draw_background()
         
+        # Skip decorative elements if transparent background
+        if self.config.output.transparent:
+            return
+        
         # Add decorative elements
         # Subtle pattern or shapes
         r, g, b, _ = self.theme.hex_to_rgba(self.theme.colors.primary_light)
@@ -140,11 +144,29 @@ class InfographicRenderer(BaseRenderer):
             opacity=opacity,
         )
         
-        # Number/step indicator
-        idx = self.config.milestones.index(milestone) + 1
-        self.theme.apply_font(self.ctx, self.theme.title_font)
-        num_str = str(idx)
-        extents = self.ctx.text_extents(num_str)
+        # Badge/step indicator - use custom badge text or default to number
+        if milestone.badge:
+            badge_text = milestone.badge
+            # Smaller font for longer text
+            base_font = self.theme.label_font if len(badge_text) > 3 else self.theme.title_font
+        else:
+            idx = self.config.milestones.index(milestone) + 1
+            badge_text = str(idx)
+            base_font = self.theme.title_font
+        
+        # Apply custom badge font size if configured
+        badge_font = base_font
+        if self.config.fonts and self.config.fonts.badge:
+            from ..themes.base import FontConfig as ThemeFontConfig
+            badge_font = ThemeFontConfig(
+                family=base_font.family,
+                size=self.config.fonts.badge,
+                bold=base_font.bold,
+                italic=base_font.italic,
+            )
+        
+        self.theme.apply_font(self.ctx, badge_font)
+        extents = self.ctx.text_extents(badge_text)
         
         r, g, b, _ = self.theme.hex_to_rgba(color)
         self.ctx.set_source_rgba(r, g, b, opacity)
@@ -152,30 +174,41 @@ class InfographicRenderer(BaseRenderer):
             cx - extents.width / 2,
             cy + extents.height / 3,
         )
-        self.ctx.show_text(num_str)
+        self.ctx.show_text(badge_text)
         
-        # Title below
+        # Title below - apply custom title font size if configured
+        title_font = self.theme.label_font
+        if self.config.fonts and self.config.fonts.title:
+            from ..themes.base import FontConfig as ThemeFontConfig
+            title_font = ThemeFontConfig(
+                family=self.theme.label_font.family,
+                size=self.config.fonts.title,
+                bold=self.theme.label_font.bold,
+                italic=self.theme.label_font.italic,
+            )
+        
         self.draw_text(
             milestone.title,
             ml.label_pos.x, ml.label_pos.y,
-            self.theme.label_font,
+            title_font,
             self.theme.colors.text_primary,
             max_width=ml.label_pos.width,
             align="center",
             opacity=opacity,
         )
         
-        # Date
-        date_str = milestone.date.strftime("%b %d, %Y")
-        self.draw_text(
-            date_str,
-            ml.label_pos.x, ml.label_pos.y + self.theme.label_font.size + 5,
-            self.theme.date_font,
-            color,
-            max_width=ml.label_pos.width,
-            align="center",
-            opacity=opacity,
-        )
+        # Date (skip if transparent - user likely has month in title already)
+        if not self.config.output.transparent:
+            date_str = milestone.date.strftime("%b %d, %Y")
+            self.draw_text(
+                date_str,
+                ml.label_pos.x, ml.label_pos.y + self.theme.label_font.size + 5,
+                self.theme.date_font,
+                color,
+                max_width=ml.label_pos.width,
+                align="center",
+                opacity=opacity,
+            )
         
         # Description
         if ml.description_pos and milestone.description:
