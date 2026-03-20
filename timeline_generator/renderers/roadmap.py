@@ -130,18 +130,7 @@ class RoadmapRenderer(BaseRenderer):
         # Draw card
         card = ml.marker_pos
         
-        # Shadow effect
-        if self.theme.use_shadows:
-            shadow_offset = 3
-            self.draw_rounded_rect(
-                card.x + shadow_offset, card.y + shadow_offset,
-                card.width, card.height,
-                self.theme.corner_radius,
-                self.theme.colors.shadow,
-                opacity=opacity * 0.3,
-            )
-        
-        # Card background
+        # Card background with drop shadow
         self.draw_rounded_rect(
             card.x, card.y,
             card.width, card.height,
@@ -150,6 +139,7 @@ class RoadmapRenderer(BaseRenderer):
             color,
             2,
             opacity=opacity,
+            shadow=True,
         )
         
         # Color bar at top

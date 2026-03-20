@@ -114,14 +114,18 @@ class LayoutEngine:
         self.margin = 40
         self.title_height = 60 if config.show_title else 0
         self.marker_size = 16
-        self.label_height = 24
-        self.description_height = 18
+        self.label_height = 30
+        self.description_height = 22
         self.row_spacing = 15
-        self.min_label_gap = 15  # Minimum gap between labels
-        
+        self.min_label_gap = 10  # Minimum gap between labels
+
         # Auto-layout settings
         self.max_levels = 6  # Maximum levels for stacking
-        self.level_spacing = 50  # Vertical spacing between levels
+        self.level_spacing = 55  # Vertical spacing between levels
+
+        # Dynamic label width based on canvas width and milestone count
+        n = len(config.milestones) if config.milestones else 1
+        self.label_width = max(100, min(200, int((width - 2 * self.margin) / max(n, 1) * 0.85)))
     
     def _detect_label_collisions(
         self, 
@@ -177,8 +181,8 @@ class LayoutEngine:
         # Create list of (x_pos, original_index) sorted by x position
         indexed_positions = sorted(enumerate(x_positions), key=lambda x: x[1])
         
-        # Use a fixed label width that ensures readability
-        label_width = 150  # Fixed width for consistent layout
+        # Use dynamic label width that scales with canvas
+        label_width = self.label_width
         required_gap = label_width + self.min_label_gap
         
         # Assign levels greedily - each level tracks occupied x ranges
@@ -238,8 +242,8 @@ class LayoutEngine:
         timeline_width = max(x_positions) - min(x_positions) if x_positions else self.width
         levels = self._assign_smart_levels(x_positions, timeline_width)
         
-        # Use consistent label width
-        label_width = 130
+        # Use dynamic label width
+        label_width = self.label_width
         
         # Calculate density for description visibility
         n = len(layouts)
@@ -315,7 +319,7 @@ class LayoutEngine:
             canvas_width=self.width,
             canvas_height=self.height,
         )
-        
+
         # Title area
         if self.config.show_title:
             layout.title_area = ElementPosition(
@@ -324,7 +328,7 @@ class LayoutEngine:
                 width=self.width - 2 * self.margin,
                 height=self.title_height,
             )
-        
+
         # Timeline area (main content) - reduced gap from title
         timeline_top = self.margin + self.title_height + 10
         timeline_height = self.height - timeline_top - self.margin
@@ -334,9 +338,10 @@ class LayoutEngine:
             width=self.width - 2 * self.margin,
             height=timeline_height,
         )
-        
-        # Axis line (horizontal center of timeline area)
-        axis_y = layout.timeline_area.center_y
+
+        # Place the axis at 45% height to give more room above for labels
+        # (most labels alternate above, so we bias downward slightly)
+        axis_y = layout.timeline_area.y + timeline_height * 0.45
         layout.axis_start = (layout.timeline_area.x, axis_y)
         layout.axis_end = (layout.timeline_area.right, axis_y)
         
@@ -371,25 +376,27 @@ class LayoutEngine:
             else:
                 label_y = axis_y + self.marker_size + 10
             
+            half_label = self.label_width / 2
             label_pos = ElementPosition(
-                x=x_pos - 65,  # Centered, with some width
+                x=x_pos - half_label,
                 y=label_y,
-                width=130,
+                width=self.label_width,
                 height=self.label_height,
             )
-            
+
             # Description position
             desc_pos = None
             if self.config.show_descriptions and milestone.description:
+                desc_width = self.label_width + 30
                 if is_above:
                     desc_y = label_y - self.description_height - 5
                 else:
                     desc_y = label_y + self.label_height + 5
-                
+
                 desc_pos = ElementPosition(
-                    x=x_pos - 80,
+                    x=x_pos - desc_width / 2,
                     y=desc_y,
-                    width=160,
+                    width=desc_width,
                     height=self.description_height,
                 )
             
@@ -630,17 +637,18 @@ class LayoutEngine:
         timeline_top = header_top + header_height + 10
         timeline_height = self.height - timeline_top - self.margin
         
-        label_column_width = 150
+        # Scale label column to fit longest title (min 150, max 25% of width)
+        label_column_width = max(150, min(int(self.width * 0.20), 300))
         chart_left = self.margin + label_column_width + 10
         chart_width = self.width - chart_left - self.margin
-        
+
         layout.timeline_area = ElementPosition(
             x=chart_left,
             y=timeline_top,
             width=chart_width,
             height=timeline_height,
         )
-        
+
         # Row height based on number of milestones
         num_milestones = len(self.config.milestones)
         row_height = min(50, max(30, timeline_height / max(1, num_milestones)))
@@ -860,16 +868,53 @@ class LayoutEngine:
         return layout
     
     def calculate_infographic_layout(self) -> TimelineLayout:
-        """Calculate layout for infographic style."""
+        """Calculate layout for infographic style.
+
+        Uses a snake-pattern grid layout. Dynamically sizes markers and adjusts
+        the canvas height to fit all milestones rather than clipping.
+        """
+        num_milestones = len(self.config.milestones)
+
+        # Title area (larger for infographic)
+        title_height = 100 if self.config.show_title else 0
+
+        # Determine grid dimensions
+        cols = min(3, num_milestones)
+        rows = (num_milestones + cols - 1) // cols
+
+        # Size each cell to fit: marker + label + description + padding
+        # Scale marker size based on available space
+        content_width = self.width - 2 * self.margin
+        col_width = content_width / cols
+
+        # Marker size scales with column width but has bounds
+        marker_size = max(40, min(80, col_width * 0.35))
+        label_height = 30
+        desc_height = 40 if self.config.show_descriptions else 0
+        cell_padding = 20
+
+        # Total height needed per row
+        row_height = marker_size + label_height + desc_height + cell_padding * 2
+
+        # Calculate required content height and adjust canvas if needed
+        content_top = self.margin + title_height + 30
+        required_content_height = rows * row_height
+        required_total_height = content_top + required_content_height + self.margin
+
+        # Expand canvas height if milestones won't fit
+        canvas_height = max(self.height, int(required_total_height))
+        content_height = canvas_height - content_top - self.margin
+
+        # Update renderer dimensions if canvas grew
+        self.height = canvas_height
+
         layout = TimelineLayout(
             config=self.config,
             scale_info=self.scale_info,
             canvas_width=self.width,
-            canvas_height=self.height,
+            canvas_height=canvas_height,
         )
-        
-        # Title area (larger for infographic)
-        title_height = 100 if self.config.show_title else 0
+
         if self.config.show_title:
             layout.title_area = ElementPosition(
                 x=self.margin,
@@ -877,65 +922,52 @@ class LayoutEngine:
                 width=self.width - 2 * self.margin,
                 height=title_height,
             )
-        
-        # Main content area
-        content_top = self.margin + title_height + 30
-        content_height = self.height - content_top - self.margin
-        content_width = self.width - 2 * self.margin
-        
+
         layout.timeline_area = ElementPosition(
             x=self.margin,
             y=content_top,
             width=content_width,
             height=content_height,
         )
-        
-        # Winding path through milestones
-        num_milestones = len(self.config.milestones)
-        
-        # Calculate positions in a flowing layout
-        cols = 3
-        row_height = content_height / ((num_milestones + cols - 1) // cols + 0.5)
-        col_width = content_width / cols
-        
+
         for i, milestone in enumerate(self.config.milestones):
             row = i // cols
             col = i % cols
-            
+
             # Alternate direction for snake-like pattern
             if row % 2 == 1:
                 col = cols - 1 - col
-            
+
             x = self.margin + col * col_width + col_width / 2
-            y = content_top + row * row_height + row_height / 2
-            
-            # Large circular marker
-            marker_size = 80
+            y = content_top + row * row_height + cell_padding + marker_size / 2
+
             marker_pos = ElementPosition(
                 x=x - marker_size / 2,
                 y=y - marker_size / 2,
                 width=marker_size,
                 height=marker_size,
             )
-            
+
             # Label below marker
+            label_width = min(col_width - 20, 200)
             label_pos = ElementPosition(
-                x=x - 80,
+                x=x - label_width / 2,
                 y=y + marker_size / 2 + 10,
-                width=160,
-                height=30,
+                width=label_width,
+                height=label_height,
             )
-            
+
             # Description
             desc_pos = None
             if self.config.show_descriptions and milestone.description:
+                desc_width = min(col_width - 10, 220)
                 desc_pos = ElementPosition(
-                    x=x - 90,
-                    y=y + marker_size / 2 + 45,
-                    width=180,
-                    height=40,
+                    x=x - desc_width / 2,
+                    y=y + marker_size / 2 + 10 + label_height + 5,
+                    width=desc_width,
+                    height=desc_height,
                 )
-            
+
             layout.milestone_layouts.append(
                 MilestoneLayout(
                     milestone=milestone,
@@ -945,6 +977,6 @@ class LayoutEngine:
                     row=row,
                 )
             )
-        
+
         return layout
 

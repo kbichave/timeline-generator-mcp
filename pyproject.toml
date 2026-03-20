@@ -1,7 +1,7 @@
 [project]
 name = "timeline-generator-mcp"
-version = "0.1.0"
-description = "A CLI tool and MCP server to generate beautiful timeline images and animated GIFs from milestone data"
+version = "1.0.0"
+description = "Professional timeline visualization tool — generate beautiful images and animated GIFs from milestone data. 8 themes, 5 styles, export presets, animation effects."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -10,7 +10,7 @@ authors = [
 ]
 keywords = ["timeline", "visualization", "gif", "animation", "cli", "mcp", "model-context-protocol"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
     "Intended Audience :: End Users/Desktop",
     "License :: OSI Approved :: MIT License",

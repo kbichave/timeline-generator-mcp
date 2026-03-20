@@ -70,15 +70,25 @@ class ColorPalette:
 
 
 @dataclass
+class GradientConfig:
+    """Configuration for background gradients."""
+
+    enabled: bool = False
+    direction: str = "vertical"  # vertical, horizontal, radial
+    colors: list[str] = field(default_factory=lambda: ["#FFFFFF", "#F5F5F5"])
+    stops: list[float] = field(default_factory=lambda: [0.0, 1.0])
+
+
+@dataclass
 class Theme:
     """Base theme configuration."""
-    
+
     name: str = "base"
     display_name: str = "Base Theme"
-    
+
     # Colors
     colors: ColorPalette = field(default_factory=ColorPalette)
-    
+
     # Typography
     title_font: FontConfig = field(default_factory=lambda: FontConfig(
         family="Sans", size=32.0, bold=True
@@ -95,23 +105,26 @@ class Theme:
     date_font: FontConfig = field(default_factory=lambda: FontConfig(
         family="Sans", size=11.0
     ))
-    
+
     # Shapes and sizes
     marker_radius: float = 8.0
     marker_border_width: float = 2.0
     line_width: float = 3.0
     connector_width: float = 1.5
-    
+
     # Effects
     use_shadows: bool = True
     shadow_blur: float = 4.0
     shadow_offset: tuple[float, float] = (2.0, 2.0)
     corner_radius: float = 8.0
-    
+
+    # Gradient background
+    gradient: GradientConfig = field(default_factory=GradientConfig)
+
     # Spacing
     padding: float = 16.0
     margin: float = 24.0
-    
+
     # Animation (for GIF generation)
     animation_duration: float = 0.5  # Per element
     animation_easing: str = "ease-out"
@@ -144,6 +157,27 @@ class Theme:
         ctx.select_font_face(font_config.family, slant, weight)
         ctx.set_font_size(font_config.size)
     
+    def apply_font_overrides(self, font_config) -> None:
+        """Apply custom font overrides from config.
+
+        Args:
+            font_config: FontConfig object with optional font overrides.
+        """
+        if font_config is None:
+            return
+
+        if font_config.family:
+            self.title_font.family = font_config.family
+            self.subtitle_font.family = font_config.family
+            self.label_font.family = font_config.family
+            self.description_font.family = font_config.family
+            self.date_font.family = font_config.family
+
+        if font_config.title:
+            self.label_font.size = font_config.title
+        if font_config.description:
+            self.description_font.size = font_config.description
+
     def apply_color_overrides(self, color_config) -> None:
         """Apply custom color overrides from config.
         

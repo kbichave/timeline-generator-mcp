@@ -10,7 +10,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from rich.panel import Panel
 
 from . import __version__
-from .models import TimelineStyle, ThemeName, TimeScale, OutputFormat, TimelineConfig
+from .models import TimelineStyle, ThemeName, TimeScale, OutputFormat, TimelineConfig, ExportPreset, PRESET_DIMENSIONS
 from .parser import parse_file, parse_quick_milestones, create_config_from_quick, ParserError
 from .themes import THEMES
 from .renderers import (
@@ -163,10 +163,12 @@ def generate(
         # Get theme and renderer
         theme_instance = get_theme(config.theme.value)
         
-        # Apply custom color overrides from config
+        # Apply custom overrides from config
         if config.colors:
             theme_instance.apply_color_overrides(config.colors)
-        
+        if config.fonts:
+            theme_instance.apply_font_overrides(config.fonts)
+
         renderer = get_renderer(config, theme_instance)
         
         # Generate output
@@ -393,6 +395,10 @@ def themes():
         "corporate": ("Professional business style", "Navy & Blue"),
         "creative": ("Bold and playful design", "Coral & Turquoise"),
         "dark": ("Modern dark mode aesthetic", "Dark with neon accents"),
+        "neon": ("Vibrant glowing neon on dark", "Cyan & Magenta"),
+        "pastel": ("Soft friendly pastel colors", "Rose & Sky"),
+        "ocean": ("Deep aquatic blue-green tones", "Blues & Teals"),
+        "sunset": ("Warm golden hour gradient", "Orange & Gold"),
     }
     
     for name in ThemeName:
@@ -461,60 +467,165 @@ def init(
     ),
 ):
     """Create a sample timeline configuration file."""
-    template = '''# Timeline Generator MCP Configuration
+    template = '''# Timeline Generator Configuration
 # Documentation: https://github.com/kbichave/timeline-generator-mcp
 
 title: "My Project Timeline"
 subtitle: "Key milestones and deliverables"
 scale: monthly          # hourly, daily, weekly, monthly, quarterly, yearly
 style: horizontal       # horizontal, vertical, gantt, roadmap, infographic
-theme: corporate        # minimal, corporate, creative, dark
+theme: corporate        # minimal, corporate, creative, dark, neon, pastel, ocean, sunset
 
 milestones:
   - date: "2024-01-15"
     title: "Project Kickoff"
     description: "Initial planning and team assembly"
     highlight: true
-    
+
   - date: "2024-02-01"
     title: "Requirements Complete"
     description: "Finalized project requirements and specifications"
-    
+
   - date: "2024-03-15"
     title: "Design Phase"
     description: "UI/UX design and architecture planning"
     category: "design"
-    
+
   - date: "2024-05-01"
     title: "Development Start"
     description: "Begin implementation phase"
     category: "development"
-    
+
   - date: "2024-07-15"
     title: "Beta Release"
     description: "Internal testing and feedback"
     highlight: true
-    
+
   - date: "2024-09-01"
     title: "Public Launch"
     description: "Official release to production"
     highlight: true
     color: "#4CAF50"
 
-text_wrap: true          # Enable text wrapping for long titles/descriptions
+text_wrap: true
+
+# Optional: custom font family (overrides theme default)
+# fonts:
+#   family: "Georgia"
+#   title: 16
+#   description: 12
+
+# Optional: watermark/branding
+# watermark:
+#   text: "Made with TimelineGen"
+#   position: bottom-right
+#   opacity: 0.3
 
 output:
   format: png           # png, svg, gif, mp4
+  # preset: ig-post     # ig-story, ig-post, linkedin, twitter, yt-thumbnail, presentation
   width: 1920
   height: 1080
   fps: 30              # For gif/mp4 only
   duration: 5          # Seconds, for gif/mp4 only
+  # animation_effect: fade  # fade, slide-up, slide-left, pop, scale
 '''
     
     output.write_text(template)
     console.print(f"[bold green]✓[/] Template created: [cyan]{output}[/]")
     console.print("\nEdit the file and run:")
     console.print(f"  [cyan]timeline-gen generate {output}[/]")
+
+
+@app.command()
+def presets():
+    """List all available export size presets."""
+    table = Table(title="Export Size Presets")
+    table.add_column("Preset", style="cyan")
+    table.add_column("Size", style="bold")
+    table.add_column("Use Case")
+
+    preset_info = {
+        "hd-16:9": "Standard HD video/presentation",
+        "ig-story": "Instagram Story / TikTok",
+        "ig-post": "Instagram square post",
+        "linkedin": "LinkedIn feed post",
+        "twitter": "Twitter/X post",
+        "presentation": "16:9 slide deck",
+        "a4-landscape": "Print-quality A4 landscape",
+        "yt-thumbnail": "YouTube thumbnail",
+    }
+
+    for name, (w, h) in PRESET_DIMENSIONS.items():
+        table.add_row(name, f"{w}x{h}", preset_info.get(name, ""))
+
+    console.print(table)
+
+
+@app.command()
+def demo(
+    output_dir: Path = typer.Option(
+        Path("demo_output"),
+        "-o", "--output-dir",
+        help="Directory to save demo outputs.",
+    ),
+):
+    """Generate a showcase of all styles and themes."""
+    from datetime import datetime as dt
+    from .models import Milestone, OutputConfig
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    demo_milestones = [
+        Milestone(date=dt(2024, 1, 15), title="Project Kickoff", description="Team assembled", highlight=True),
+        Milestone(date=dt(2024, 3, 1), title="Design Complete", description="UI/UX finalized"),
+        Milestone(date=dt(2024, 5, 15), title="Beta Launch", description="First users onboarded", highlight=True),
+        Milestone(date=dt(2024, 8, 1), title="Scale Phase", description="Performance optimization"),
+        Milestone(date=dt(2024, 11, 1), title="v1.0 Release", description="Production ready", color="#4CAF50"),
+    ]
+
+    generated = []
+    theme_list = [t.value for t in ThemeName]
+    style_list = ["horizontal", "vertical", "infographic"]
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        console=console,
+    ) as progress:
+        total = len(theme_list) * len(style_list)
+        task = progress.add_task("Generating demo showcase...", total=total)
+
+        for theme_name in theme_list:
+            for style_name in style_list:
+                try:
+                    config = TimelineConfig(
+                        title=f"{style_name.title()} — {theme_name.title()}",
+                        subtitle="Timeline Generator Demo",
+                        scale=TimeScale.MONTHLY,
+                        style=TimelineStyle(style_name),
+                        theme=ThemeName(theme_name),
+                        milestones=demo_milestones,
+                        output=OutputConfig(width=1280, height=720),
+                    )
+
+                    theme_instance = get_theme(config.theme.value)
+                    renderer = get_renderer(config, theme_instance)
+                    exporter = ImageExporter(renderer)
+
+                    filename = f"{style_name}_{theme_name}.png"
+                    exporter.export_png(output_dir / filename)
+                    generated.append(filename)
+                except Exception as e:
+                    console.print(f"  [yellow]Skipped {style_name}/{theme_name}: {e}[/]")
+
+                progress.update(task, advance=1)
+
+    console.print(f"\n[bold green]✓[/] Generated {len(generated)} demo images in [cyan]{output_dir}/[/]")
+    console.print(f"  Styles: {', '.join(style_list)}")
+    console.print(f"  Themes: {', '.join(theme_list)}")
 
 
 if __name__ == "__main__":

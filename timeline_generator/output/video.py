@@ -46,32 +46,32 @@ class VideoExporter:
             num_frames = int(fps * duration)
         
         frames = []
-        
-        # Hold frames at the start (show title only)
-        hold_frames = 10 if include_hold_frames else 0
-        
-        # Generate animation frames
-        total_animation_frames = num_frames - (hold_frames * 2)
-        
+
+        # Hold frames scale with total frame count (10% start, 15% end)
+        if include_hold_frames and num_frames >= 6:
+            hold_start = max(1, int(num_frames * 0.10))
+            hold_end = max(1, int(num_frames * 0.15))
+        else:
+            hold_start = 0
+            hold_end = 0
+
+        # Animation frames are the remainder
+        total_animation_frames = max(1, num_frames - hold_start - hold_end)
+
         for i in range(num_frames):
-            if i < hold_frames:
-                # Initial hold - minimal content
+            if i < hold_start:
                 progress = 0.0
-            elif i >= num_frames - hold_frames:
-                # Final hold - full content
+            elif i >= num_frames - hold_end:
                 progress = 1.0
             else:
-                # Animation progress
-                anim_frame = i - hold_frames
+                anim_frame = i - hold_start
                 progress = anim_frame / max(1, total_animation_frames - 1)
-                # Apply easing
                 progress = self._ease_out_cubic(progress)
-            
-            # Render frame
+
             surface = self.renderer.render_frame(progress)
             frame = self.renderer.surface_to_pil()
             frames.append(frame)
-        
+
         return frames
     
     def _ease_out_cubic(self, t: float) -> float:
@@ -142,26 +142,29 @@ class VideoExporter:
         return path
     
     def _optimize_frame(self, frame: Image.Image, transparent: bool = False) -> Image.Image:
-        """Optimize a frame for GIF format."""
+        """Optimize a frame for GIF format with improved quality.
+
+        Uses MAXCOVERAGE quantization with dithering for smoother color gradients.
+        """
         if transparent and frame.mode == "RGBA":
-            # Keep transparency for GIF
-            # Convert RGBA to P with transparency
             alpha = frame.split()[3]
-            frame = frame.convert("RGB").quantize(colors=255, method=Image.Quantize.MEDIANCUT)
-            frame = frame.convert("P")
+            # Use better quantization for quality
+            rgb_frame = frame.convert("RGB")
+            quantized = rgb_frame.quantize(colors=255, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG)
+            quantized = quantized.convert("P")
             # Set transparency index
             mask = Image.eval(alpha, lambda a: 255 if a <= 128 else 0)
-            frame.paste(255, mask)
-            frame.info['transparency'] = 255
-            return frame
+            quantized.paste(255, mask)
+            quantized.info['transparency'] = 255
+            return quantized
         elif frame.mode == "RGBA":
-            # Create a white background for non-transparent
+            # Composite onto a solid background
             background = Image.new("RGB", frame.size, (255, 255, 255))
             background.paste(frame, mask=frame.split()[3])
             frame = background
-        
-        # Quantize to reduce colors
-        return frame.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
+
+        # Use Floyd-Steinberg dithering for smoother gradients
+        return frame.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG)
     
     def export_mp4(
         self,

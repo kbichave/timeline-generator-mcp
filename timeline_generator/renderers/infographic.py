@@ -10,14 +10,25 @@ class InfographicRenderer(BaseRenderer):
     """Renderer for creative infographic style timeline."""
     
     def calculate_layout(self) -> TimelineLayout:
-        """Calculate infographic layout."""
+        """Calculate infographic layout.
+
+        The layout engine may expand the canvas height to fit all milestones.
+        When that happens we must resize our surface to match.
+        """
         engine = LayoutEngine(
             self.config,
             self.scale_info,
             self.width,
             self.height,
         )
-        return engine.calculate_infographic_layout()
+        layout = engine.calculate_infographic_layout()
+
+        # Sync renderer dimensions if the layout engine expanded the canvas
+        if engine.height != self.height:
+            self.height = engine.height
+            self.reset_surface()
+
+        return layout
     
     def draw_background(self) -> None:
         """Draw decorative background for infographic."""

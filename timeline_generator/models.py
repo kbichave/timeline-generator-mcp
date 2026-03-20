@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class TimeScale(str, Enum):
@@ -30,11 +30,15 @@ class TimelineStyle(str, Enum):
 
 class ThemeName(str, Enum):
     """Available theme names."""
-    
+
     MINIMAL = "minimal"
     CORPORATE = "corporate"
     CREATIVE = "creative"
     DARK = "dark"
+    NEON = "neon"
+    PASTEL = "pastel"
+    OCEAN = "ocean"
+    SUNSET = "sunset"
 
 
 class OutputFormat(str, Enum):
@@ -102,16 +106,65 @@ class ColorConfig(BaseModel):
 
 
 class FontConfig(BaseModel):
-    """Font size configuration."""
-    
+    """Font size and family configuration."""
+
     badge: Optional[int] = Field(default=None, ge=8, le=120, description="Badge/marker font size")
     title: Optional[int] = Field(default=None, ge=8, le=120, description="Milestone title font size")
     description: Optional[int] = Field(default=None, ge=8, le=72, description="Description font size")
+    family: Optional[str] = Field(
+        default=None, max_length=100,
+        description="Font family name (e.g., 'Arial', 'Georgia', 'Menlo'). Overrides theme font.",
+    )
+
+
+class WatermarkConfig(BaseModel):
+    """Watermark/branding configuration."""
+
+    text: Optional[str] = Field(default=None, max_length=100, description="Watermark text")
+    position: str = Field(default="bottom-right", description="Position: bottom-right, bottom-left, top-right, top-left")
+    opacity: float = Field(default=0.3, ge=0.0, le=1.0, description="Watermark opacity")
+    font_size: int = Field(default=14, ge=8, le=48, description="Watermark font size")
+
+
+class AnimationEffect(str, Enum):
+    """Available animation effects for GIF/MP4 milestone reveal."""
+
+    FADE = "fade"
+    SLIDE_UP = "slide-up"
+    SLIDE_LEFT = "slide-left"
+    POP = "pop"
+    SCALE = "scale"
+
+
+class ExportPreset(str, Enum):
+    """Predefined export size presets for common platforms."""
+
+    CUSTOM = "custom"
+    HD_16_9 = "hd-16:9"            # 1920x1080
+    INSTAGRAM_STORY = "ig-story"    # 1080x1920
+    INSTAGRAM_POST = "ig-post"      # 1080x1080
+    LINKEDIN_POST = "linkedin"      # 1200x627
+    TWITTER_POST = "twitter"        # 1600x900
+    PRESENTATION = "presentation"   # 1920x1080
+    A4_LANDSCAPE = "a4-landscape"   # 3508x2480 (300dpi)
+    YOUTUBE_THUMB = "yt-thumbnail"  # 1280x720
+
+
+PRESET_DIMENSIONS: dict[str, tuple[int, int]] = {
+    "hd-16:9": (1920, 1080),
+    "ig-story": (1080, 1920),
+    "ig-post": (1080, 1080),
+    "linkedin": (1200, 627),
+    "twitter": (1600, 900),
+    "presentation": (1920, 1080),
+    "a4-landscape": (3508, 2480),
+    "yt-thumbnail": (1280, 720),
+}
 
 
 class OutputConfig(BaseModel):
     """Configuration for output generation."""
-    
+
     format: OutputFormat = Field(default=OutputFormat.PNG)
     width: int = Field(default=1920, ge=100, le=8000)
     height: int = Field(default=1080, ge=100, le=8000)
@@ -123,6 +176,23 @@ class OutputConfig(BaseModel):
     transparent: bool = Field(
         default=False, description="Use transparent background (PNG/GIF only)"
     )
+    animation_effect: AnimationEffect = Field(
+        default=AnimationEffect.FADE,
+        description="Animation effect for milestone reveal in GIF/MP4",
+    )
+    preset: ExportPreset = Field(
+        default=ExportPreset.CUSTOM,
+        description="Predefined size preset. Overrides width/height when not 'custom'.",
+    )
+
+    @model_validator(mode="after")
+    def apply_preset_dimensions(self):
+        """When a preset is selected, override width and height."""
+        if self.preset != ExportPreset.CUSTOM:
+            dims = PRESET_DIMENSIONS.get(self.preset.value)
+            if dims:
+                self.width, self.height = dims
+        return self
 
 
 class TimelineConfig(BaseModel):
@@ -156,6 +226,11 @@ class TimelineConfig(BaseModel):
     # Category/swimlane settings (for roadmap and gantt)
     categories: Optional[list[str]] = Field(
         default=None, description="Ordered list of categories for swimlanes"
+    )
+
+    # Watermark/branding
+    watermark: Optional[WatermarkConfig] = Field(
+        default=None, description="Optional watermark/branding overlay"
     )
     
     @field_validator("milestones")

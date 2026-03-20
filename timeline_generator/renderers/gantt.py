@@ -61,8 +61,7 @@ class GanttRenderer(BaseRenderer):
     
     def draw_scale_markers(self, layout: TimelineLayout) -> None:
         """Draw row separators."""
-        label_width = 150
-        chart_left = self.theme.margin + label_width + 10
+        chart_left = layout.timeline_area.x
         
         # Horizontal row dividers
         num_milestones = len(self.config.milestones)

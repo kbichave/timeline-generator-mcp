@@ -132,6 +132,7 @@ class VerticalRenderer(BaseRenderer):
             color,
             1.5,
             opacity=opacity,
+            shadow=True,
         )
         
         # Draw date badge
